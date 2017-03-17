@@ -7,6 +7,8 @@ var Table = require('cli-table');
 commander
     .version('0.0.1')
     .usage('<keywords>')
+    .option('-o, --owner [name]', 'Filter by the repositories owner')
+    .option('-l, --language [language]', 'Filter by the repositories language')
     .parse(process.argv);
 
 if (!commander.args.length) {
@@ -16,6 +18,13 @@ if (!commander.args.length) {
     var keywords = commander.args;
     var url = 'https://api.github.com/search/repositories?sort=stars&order=desc&q=' + keywords;
 
+    //add filter param owner
+    if (commander.owner) {
+        url = url + "+user:" + commander.owner;
+    }
+    if (commander.language) {
+        url = url + "+language:" + commander.language;
+    }
     //send request
     request({
         method: 'GET',
@@ -30,15 +39,16 @@ if (!commander.args.length) {
             console.log("the number of found repositories is :", body.total_count);
             var table = new Table({
                 head: ['name', 'http url'],
-                colWidths: [100, 200]
+                colWidths: [60, 100]
             });
             var result = [];
             body.items.forEach(function(ele, index) {
-                table.push([ele.name, ele.html_url]);
+                table.push([ele.name, ele.clone_url]);
             });
             console.log(table.toString());
         } else if (error) {
             console.log('Error: ' + error);
+            process.exit(1);
         }
     });
 }
