@@ -3,6 +3,7 @@
 var commander = require("commander");
 var request = require("request");
 var Table = require('cli-table');
+var config = require('./config')
 
 commander
     .version('0.0.1')
@@ -29,7 +30,7 @@ if (!commander.args.length) {
     request({
         method: 'GET',
         headers: {
-            'User-Agent': 'houyaowei'
+            'User-Agent': config.usrAgent
         },
         url: url
     }, function(error, response, body) {
@@ -38,8 +39,8 @@ if (!commander.args.length) {
             var body = JSON.parse(body);
             console.log("the number of found repositories is :", body.total_count);
             var table = new Table({
-                head: ['name', 'http url'],
-                colWidths: [60, 100]
+                head: ['Name', 'cloneUrl'],
+                colWidths: [45, 100]
             });
             var result = [];
             body.items.forEach(function(ele, index) {
